@@ -1,0 +1,8 @@
+# Nexus 5
+06bd511c006231a6 --user 0
+
+# Nexus 6P
+84B5T15915000128 --user 10
+
+# Nexus 6
+ZX1G224KNF --user 10

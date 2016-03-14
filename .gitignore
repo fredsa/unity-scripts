@@ -1,0 +1,37 @@
+# OSX
+.DS_Store
+
+# Sublime
+*.sublime-workspace
+
+# MonoDevelop
+*.userprefs
+/obj/
+
+# Visual Studio / MonoDevelop
+*.csproj
+*.sln
+
+# Unity derived files
+/Temp/
+/Library/
+
+# Visual Studio
+/.vs/
+
+# Build output Android
+/*.apk
+
+# Build output OSX
+/*.app/
+
+# Build output WebGL
+/.*WebGL/
+
+# Build output Windows
+/*.exe
+/*_Data/
+/player_win_x86.pdb
+/player_win_x86_s.pdb
+/player_win_development_x86.pdb
+/player_win_development_x86_s.pdb
