@@ -30,6 +30,7 @@ public class FredBuildEditor : EditorWindow
 		string apk = PlayerSettings.bundleIdentifier + ".apk";
 		DateTime creationTime = File.GetCreationTime (apk);
 
+		EditorUserBuildSettings.SwitchActiveBuildTarget (BuildTarget.Android);
 		BuildPipeline.BuildPlayer (GetSceneNames (), apk, BuildTarget.Android, BuildOptions.None);
 		
 		if (File.GetCreationTime (apk).Equals (creationTime)) {

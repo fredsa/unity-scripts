@@ -21,10 +21,10 @@ then
     diff "$file" "$REFDIR/$file" || true
   done
   echo
-  echo "To fix this run:"
+  echo "To fix this review:"
   for file in $diff_list
   do
-    echo "  cp $REFDIR/$file $file"
+    echo "  diff $file $REFDIR/$file"
   done
   exit 1
 fi
