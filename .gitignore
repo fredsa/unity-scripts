@@ -9,6 +9,7 @@
 /obj/
 
 # Visual Studio / MonoDevelop
+*.unityproj
 *.csproj
 *.sln
 
