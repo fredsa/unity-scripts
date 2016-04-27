@@ -102,6 +102,16 @@ do
 
     if [ "${1:-}" != "-n" ]
     then
+      android_version="$( adb shell getprop ro.build.version.release | cut -d. -f1 )"
+      if [ $android_version == "N" ]
+      then
+        grant_flag="-g"
+      elif [ $android_version -ge 6 ]
+      then
+        grant_flag="-g"
+      else
+        grant_flag=""
+      fi
       # adb install
       #   -l: forward lock application
       #   -r: replace existing application
@@ -109,11 +119,11 @@ do
       #   -s: install application on sdcard
       #   -d: allow version code downgrade
       #   -g: grant all runtime permissions
-      install_pkg -r -d -g $adb_args $apk ||
+      install_pkg -r -d $grant_flag $adb_args $apk ||
       (
         echo " and reinstalling on $serial"
         uninstall_pkg $pkg \
-         && install_pkg $adb_args $apk
+         && install_pkg -r -d $grant_flag $adb_args $apk
       )
     fi
 
