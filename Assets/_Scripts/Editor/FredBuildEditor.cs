@@ -32,7 +32,7 @@ public class FredBuildEditor : EditorWindow
 
 		EditorUserBuildSettings.SwitchActiveBuildTarget (BuildTarget.Android);
 		BuildPipeline.BuildPlayer (GetSceneNames (), apk, BuildTarget.Android, BuildOptions.None);
-		
+
 		if (File.GetCreationTime (apk).Equals (creationTime)) {
 			UnityEngine.Debug.LogError ("Failed to build " + apk);
 		} else {
@@ -51,7 +51,7 @@ public class FredBuildEditor : EditorWindow
 		return names;
 	}
 
-	[MenuItem ("FRED/Build %&i")]
+	[MenuItem ("FRED/Install %&i")]
 	static void ReinstallGame ()
 	{
 		if (executing) {
@@ -156,7 +156,7 @@ public class FredBuildEditor : EditorWindow
 	{
 		return ">  " + Regex.Replace (output, "\n", "\n>  ", RegexOptions.Multiline);
 	}
-		
+
 	// Since UnityEngine.Debug.ClearDeveloperConsole() doesn't work
 	static void ClearLog ()
 	{
