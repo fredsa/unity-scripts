@@ -2,7 +2,7 @@
 
 set -ue
 
-REFDIR=/fred/src/unity-scripts
+REFDIR=../unity-scripts
 
 diff_list=""
 for file in $( cd $REFDIR; git ls-files )
