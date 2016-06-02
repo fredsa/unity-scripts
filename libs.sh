@@ -15,6 +15,12 @@ commits=$(
   | sort -u
 )
 
+echo "Unique commits:"
+for commit in $commits
+do
+  echo $commit
+done
+
 for commit in $commits
 do
   echo
