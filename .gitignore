@@ -39,3 +39,7 @@
 
 # Screenshots
 /*.png
+
+# Steamworks
+/steamworks_sdk
+/build
