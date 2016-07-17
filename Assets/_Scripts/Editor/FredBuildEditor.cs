@@ -24,20 +24,35 @@ public class FredBuildEditor : EditorWindow
 	static void BuildGame ()
 	{
 		ClearLog ();
+		UnityEngine.Debug.Log ("FRED/Build " + EditorUserBuildSettings.activeBuildTarget + "\n");
 
 		CheckPasswords ();
 
-		string apk = PlayerSettings.bundleIdentifier + ".apk";
-		DateTime creationTime = File.GetCreationTime (apk);
+		string binary;
+		switch (EditorUserBuildSettings.activeBuildTarget) {
+		case BuildTarget.Android:
+			binary = PlayerSettings.bundleIdentifier + ".apk";
+			break;
+		case BuildTarget.StandaloneWindows:
+			DirectoryInfo projectRoot = Directory.GetParent (Application.dataPath);
+			string projectDirname = projectRoot.Name;
+			binary = projectRoot + "/" + projectDirname + ".exe";
+			break;
+		default:
+			throw new NotImplementedException ("Build target " + EditorUserBuildSettings.activeBuildTarget);
+		}
+		DateTime lastWriteTime = File.GetLastWriteTime (binary);
+		UnityEngine.Debug.Log ("- Binary: " + binary + "\n");
 
-		EditorUserBuildSettings.SwitchActiveBuildTarget (BuildTarget.Android);
-		BuildPipeline.BuildPlayer (GetSceneNames (), apk, BuildTarget.Android, BuildOptions.None);
+		BuildPipeline.BuildPlayer (GetSceneNames (), binary, EditorUserBuildSettings.activeBuildTarget, BuildOptions.None);
 
-		if (File.GetCreationTime (apk).Equals (creationTime)) {
-			UnityEngine.Debug.LogError ("Failed to build " + apk);
+		if (File.GetLastWriteTime (binary).Equals (lastWriteTime)) {
+			UnityEngine.Debug.LogError ("Failed to build " + binary);
 		} else {
-			UnityEngine.Debug.Log ("Successfully built " + apk);
-			UnityEngine.Debug.LogWarning ("Don't forget to use ALT-CMD-I to install.");
+			UnityEngine.Debug.Log ("Successfully built " + binary);
+			if (EditorUserBuildSettings.activeBuildTarget == BuildTarget.Android) {
+				UnityEngine.Debug.LogWarning ("Don't forget to use ALT-CMD-I to install.");
+			}
 		}
 	}
 
@@ -46,7 +61,7 @@ public class FredBuildEditor : EditorWindow
 		string[] names = new string[SceneManager.sceneCount];
 		for (int i = 0; i < SceneManager.sceneCount; i++) {
 			names [i] = SceneManager.GetSceneAt (i).path;
-			UnityEngine.Debug.Log (names [i]);
+			UnityEngine.Debug.Log ("- Scene " + i + ": " + names [i] + "\n");
 		}
 		return names;
 	}
@@ -54,12 +69,19 @@ public class FredBuildEditor : EditorWindow
 	[MenuItem ("FRED/Install %&i")]
 	static void ReinstallGame ()
 	{
+		if (EditorUserBuildSettings.activeBuildTarget != BuildTarget.Android) {
+			UnityEngine.Debug.LogError ("Build target = " + EditorUserBuildSettings.activeBuildTarget + " (=NOT " + BuildTarget.Android + ")");
+			return;
+		}
+
 		if (executing) {
 			UnityEngine.Debug.LogError ("Already executing !!");
 			return;
 		}
 
 		ClearLog ();
+		UnityEngine.Debug.Log ("FRED/Install " + EditorUserBuildSettings.activeBuildTarget + "\n");
+
 		new Thread (new ThreadStart (InstallApk)).Start ();
 	}
 
