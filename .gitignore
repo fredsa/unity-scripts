@@ -43,3 +43,7 @@
 # Steamworks
 /steamworks_sdk
 /build
+
+# Blender
+*.blend[0-9]
+*.blend[0-9].meta
