@@ -58,12 +58,17 @@ public class FredBuildEditor : EditorWindow
 
 	static string[] GetSceneNames ()
 	{
-		string[] names = new string[SceneManager.sceneCount];
+		string[] paths = new string[SceneManager.sceneCount];
 		for (int i = 0; i < SceneManager.sceneCount; i++) {
-			names [i] = SceneManager.GetSceneAt (i).path;
-			UnityEngine.Debug.Log ("- Scene " + i + ": " + names [i] + "\n");
+			Scene scene = SceneManager.GetSceneAt (i);
+			if (scene.path.Length == 0) {
+				UnityEngine.Debug.LogError ("Scene " + i + " unsaved (has empty path).");
+				return null;
+			}
+			paths [i] = scene.path;
+			UnityEngine.Debug.Log ("- Scene " + i + ": " + paths [i] + "\n");
 		}
-		return names;
+		return paths;
 	}
 
 	[MenuItem ("FRED/Install %&i")]
