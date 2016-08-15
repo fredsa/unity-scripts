@@ -91,7 +91,7 @@ do
     adb shell input keyevent 111
 
     # Home screen launcher
-    adb shell am start -a android.intent.action.MAIN -c android.intent.category.HOME >/dev/null
+    adb shell am start -a android.intent.action.MAIN -c android.intent.category.HOME 2>/dev/null >/dev/null
 
     # Kill app if running in background
     adb shell am force-stop $pkg
