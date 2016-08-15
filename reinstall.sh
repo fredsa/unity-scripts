@@ -106,7 +106,7 @@ do
       if [ $android_version == "N" ]
       then
         grant_flag="-g"
-      elif [ $android_version > A ]
+      elif [ $android_version \> A ]
       then
         grant_flag="-g"
       elif [ $android_version -ge 6 ]
