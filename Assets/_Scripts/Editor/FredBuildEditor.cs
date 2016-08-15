@@ -62,8 +62,7 @@ public class FredBuildEditor : EditorWindow
 		for (int i = 0; i < SceneManager.sceneCount; i++) {
 			Scene scene = SceneManager.GetSceneAt (i);
 			if (scene.path.Length == 0) {
-				UnityEngine.Debug.LogError ("Scene " + i + " unsaved (has empty path).");
-				return null;
+				throw new Exception ("Unsaved scene " + i + " (path is empty).");
 			}
 			paths [i] = scene.path;
 			UnityEngine.Debug.Log ("- Scene " + i + ": " + paths [i] + "\n");
