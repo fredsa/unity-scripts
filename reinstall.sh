@@ -74,8 +74,7 @@ uninstall_pkg()
 install_pkg()
 {
   echo "$ANDROID_SERIAL adb install $*"
-  output=$( adb install $* 2>&1 | grep -v 'KB/s' | grep -v 'pkg:' | grep -v 'Success' )
-  [ -z "$output" ]
+  adb install $* 2>&1 | grep 'Success'
 }
 
 # Begin actual un/re-install and launch
