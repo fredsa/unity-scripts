@@ -7,13 +7,15 @@ using System.Threading;
 using System.IO;
 using System.Text.RegularExpressions;
 using UnityEngine.SceneManagement;
+using System.ComponentModel;
 
 [InitializeOnLoad]
 public class FredBuildEditor : EditorWindow
 {
-	static string TWO_LINES = ".*\n.*\n";
+	const string TWO_LINES = ".*\n.*\n";
 
 	static bool executing = false;
+	static string projectDirectory;
 
 	static FredBuildEditor ()
 	{
@@ -86,14 +88,22 @@ public class FredBuildEditor : EditorWindow
 		ClearLog ();
 		UnityEngine.Debug.Log ("FRED/Install " + EditorUserBuildSettings.activeBuildTarget + "\n");
 
+
+
+		projectDirectory = new System.IO.DirectoryInfo (Application.dataPath).Parent.FullName;
 		new Thread (new ThreadStart (InstallApk)).Start ();
 	}
 
 	static void InstallApk ()
 	{
 		executing = true;
+
 		UnityEngine.Debug.Log ("$ ./reinstall.sh");
+#if UNITY_EDITOR_WIN
+		Execute ("\"C:\\Program Files\\Git\\git-bash.exe\"", "-lc", "pwd;./reinstall.sh;read");
+#else
 		Execute ("/bin/bash", "-lc", "./reinstall.sh");
+#endif
 		executing = false;
 	}
 
@@ -101,11 +111,12 @@ public class FredBuildEditor : EditorWindow
 	{
 		string joinedArgs = string.Join (" ", args);
 		Process proc = new Process ();
+		proc.StartInfo.WorkingDirectory = projectDirectory;
 		proc.StartInfo.UseShellExecute = false;
-		proc.StartInfo.CreateNoWindow = true;
-		proc.StartInfo.ErrorDialog = false;
-		proc.StartInfo.RedirectStandardError = true;
+		proc.StartInfo.CreateNoWindow = !true;
+		proc.StartInfo.ErrorDialog = !false;
 		proc.StartInfo.RedirectStandardOutput = true;
+		proc.StartInfo.RedirectStandardError = true;
 		proc.StartInfo.StandardOutputEncoding = System.Text.Encoding.UTF8;
 		proc.StartInfo.StandardErrorEncoding = System.Text.Encoding.UTF8;
 		proc.StartInfo.FileName = cmd;
@@ -143,7 +154,15 @@ public class FredBuildEditor : EditorWindow
 			}
 		);
 
-		proc.Start ();
+		try {
+			proc.Start ();
+		} catch (Win32Exception e) {
+			// https://msdn.microsoft.com/en-us/library/e8zac0ca(v=vs.110).aspx
+			UnityEngine.Debug.LogError ("proc.Start() exception: There was an error in opening the associated file\n" + e);
+		} catch (Exception e) {
+			UnityEngine.Debug.LogError ("proc.Start() exception: " + e);
+			return -1;
+		}
 		proc.BeginOutputReadLine ();
 		proc.BeginErrorReadLine ();
 		proc.WaitForExit ();
