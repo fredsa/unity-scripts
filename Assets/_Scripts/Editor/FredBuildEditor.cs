@@ -107,7 +107,7 @@ public class FredBuildEditor : EditorWindow
 		executing = false;
 	}
 
-	static int Execute (string cmd, params string[] args)
+	static  Execute (string cmd, params string[] args)
 	{
 		string joinedArgs = string.Join (" ", args);
 		Process proc = new Process ();
@@ -165,29 +165,28 @@ public class FredBuildEditor : EditorWindow
 		}
 		proc.BeginOutputReadLine ();
 		proc.BeginErrorReadLine ();
-		proc.WaitForExit ();
 
-		var exitCode = proc.ExitCode;
+		proc.Exited += (object sender, EventArgs e) => {
+			var exitCode = proc.ExitCode;
 
-		// log any remaining output
-		output = StripEmptyLines (output);
-		if (output.Length > 0) {
-			UnityEngine.Debug.Log (PrefixOutput (output));
-		}
+			// log any remaining output
+			output = StripEmptyLines (output);
+			if (output.Length > 0) {
+				UnityEngine.Debug.Log (PrefixOutput (output));
+			}
 
-		// log any remaining error
-		error = StripEmptyLines (error);
-		if (error.Length > 0) {
-			UnityEngine.Debug.LogError (PrefixOutput (error));
-		}
+			// log any remaining error
+			error = StripEmptyLines (error);
+			if (error.Length > 0) {
+				UnityEngine.Debug.LogError (PrefixOutput (error));
+			}
 
-		if (exitCode == 0) {
-			UnityEngine.Debug.Log ("$ " + cmd + " " + joinedArgs + "\n==> OK");
-		} else {
-			UnityEngine.Debug.LogError ("$ " + cmd + " " + joinedArgs + "\n==> " + exitCode);
-		}
-
-		return exitCode;
+			if (exitCode == 0) {
+				UnityEngine.Debug.Log ("$ " + cmd + " " + joinedArgs + "\n==> OK");
+			} else {
+				UnityEngine.Debug.LogError ("$ " + cmd + " " + joinedArgs + "\n==> " + exitCode);
+			}
+		};
 	}
 
 	static string StripEmptyLines (string output)
