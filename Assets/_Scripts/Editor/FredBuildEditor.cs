@@ -107,7 +107,7 @@ public class FredBuildEditor : EditorWindow
 		executing = false;
 	}
 
-	static  Execute (string cmd, params string[] args)
+	static void Execute (string cmd, params string[] args)
 	{
 		string joinedArgs = string.Join (" ", args);
 		Process proc = new Process ();
@@ -159,9 +159,10 @@ public class FredBuildEditor : EditorWindow
 		} catch (Win32Exception e) {
 			// https://msdn.microsoft.com/en-us/library/e8zac0ca(v=vs.110).aspx
 			UnityEngine.Debug.LogError ("proc.Start() exception: There was an error in opening the associated file\n" + e);
+			return;
 		} catch (Exception e) {
 			UnityEngine.Debug.LogError ("proc.Start() exception: " + e);
-			return -1;
+			return;
 		}
 		proc.BeginOutputReadLine ();
 		proc.BeginErrorReadLine ();
