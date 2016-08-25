@@ -20,11 +20,31 @@ then
     diff -q "$file" "$REFDIR/$file" || true
     diff "$file" "$REFDIR/$file" || true
   done
+
   echo
-  echo "To fix this review:"
+  echo "To review diffs:"
   for file in $diff_list
   do
     echo "  diff $file $REFDIR/$file"
   done
+
+  echo
+  echo "To push changes back to $REFDIR:"
+  for file in $diff_list
+  do
+    dname=$(dirname $REFDIR/$file)
+    [ ! -d $dname ] && echo "  mkdir -p $dname"
+    echo "  cp $file $dname/"
+  done
+
+  echo
+  echo "To fix the local repo:"
+  for file in $diff_list
+  do
+    dname=$(dirname $file)
+    [ ! -d $dname ] && echo "  mkdir -p $dname"
+    echo "  cp $REFDIR/$file $dname/"
+  done
+
   exit 1
 fi
