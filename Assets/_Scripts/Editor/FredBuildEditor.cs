@@ -20,26 +20,7 @@ public class FredBuildEditor : EditorWindow
 
 	static FredBuildEditor ()
 	{
-		VerifyVrSettings ();
 		CheckPasswords ();
-	}
-
-	[MenuItem ("FRED/Verify VR settings %&v")]
-	static void VerifyVrSettings ()
-	{
-		#if UNITY_STANDALONE_WIN
-		bool vrShouldBeSupported = true;
-		string platform = "Windows/SteamVR";
-		#else
-		bool vrShouldBeSupported = false;
-		string platform = "Android/GVR";
-		#endif
-		if (PlayerSettings.virtualRealitySupported != vrShouldBeSupported) {
-			UnityEngine.Debug.LogError (platform + ": PlayerSettings.virtualRealitySupported == " + PlayerSettings.virtualRealitySupported + " (WRONG)");
-			//PlayerSettings.virtualRealitySupported = vrShouldBeSupported;
-		} else {
-			UnityEngine.Debug.Log (platform + ": PlayerSettings.virtualRealitySupported == " + PlayerSettings.virtualRealitySupported + " (OK)");
-		}
 	}
 
 	[MenuItem ("FRED/Build %&b")]
