@@ -5,4 +5,4 @@
 84B5T15915000128 --user 10
 
 # Nexus 6
-ZX1G224KNF --user 10
+ZX1G224KNF --user 0
