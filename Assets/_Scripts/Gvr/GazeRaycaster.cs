@@ -4,8 +4,10 @@ using System.Collections;
 
 public class GazeRaycaster : BaseRaycaster
 {
+	const float MAX_DISTANCE = 1000f;
+
 	public bool debugRaycast;
-	public float maxDistance = 1000f;
+	public LayerMask layerMask;
 
 	private Vector2 centerOfViewPort = new Vector2 (.5f, .5f);
 
@@ -15,10 +17,10 @@ public class GazeRaycaster : BaseRaycaster
 	{
 		Ray ray = Camera.main.ViewportPointToRay (centerOfViewPort);
 		RaycastHit hitInfo;
-		Physics.Raycast (ray, out hitInfo, maxDistance);
+		Physics.Raycast (ray, out hitInfo, MAX_DISTANCE, layerMask);
 
 		if (debugRaycast) {
-			Debug.DrawRay (ray.origin, ray.direction * maxDistance, hitInfo.collider == null ? Color.white : Color.green);
+			Debug.DrawRay (ray.origin, ray.direction * MAX_DISTANCE, hitInfo.collider == null ? Color.white : Color.green);
 		}
 
 		if (hitInfo.collider != null) {
