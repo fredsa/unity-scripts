@@ -21,7 +21,9 @@ public class FredBuildEditor : EditorWindow
 
 	static FredBuildEditor ()
 	{
+#if UNITY_ANDROID
 		CheckPasswords ();
+#endif
 	}
 
 	[MenuItem ("FRED/Build %&b")]
