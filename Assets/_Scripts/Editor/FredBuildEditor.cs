@@ -9,6 +9,7 @@ using System.Text.RegularExpressions;
 using UnityEngine.SceneManagement;
 using System.ComponentModel;
 using UnityEngine.VR;
+using System.Collections;
 
 [InitializeOnLoad]
 public class FredBuildEditor : EditorWindow
@@ -203,13 +204,14 @@ public class FredBuildEditor : EditorWindow
 		return ">  " + Regex.Replace (output, "\n", "\n>  ", RegexOptions.Multiline);
 	}
 
-	// Since UnityEngine.Debug.ClearDeveloperConsole() doesn't work
 	static void ClearLog ()
 	{
+		// Since UnityEngine.Debug.ClearDeveloperConsole() doesn't work
+		// UnityEngine.Debug.ClearDeveloperConsole();
 		Assembly assembly = Assembly.GetAssembly (typeof(SceneView));
 		Type type = assembly.GetType ("UnityEditorInternal.LogEntries");
 		MethodInfo method = type.GetMethod ("Clear");
-		method.Invoke (new object (), null);
+		method.Invoke (new UnityEngine.Object (), null);
 	}
 
 	static void CheckPasswords ()
