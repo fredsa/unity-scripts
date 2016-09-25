@@ -172,7 +172,7 @@ public class FredBuildEditor : EditorWindow
 		proc.BeginErrorReadLine ();
 
 		proc.Exited += (object sender, EventArgs e) => {
-			var exitCode = proc.ExitCode;
+			int exitCode = proc.ExitCode;
 
 			// log any remaining output
 			output = StripEmptyLines (output);
