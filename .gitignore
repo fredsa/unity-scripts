@@ -50,3 +50,6 @@
 
 # Steamworks.NET
 steam_api.dll
+
+# GVR
+/GvrIgnoreManifestMergeCheck.txt
