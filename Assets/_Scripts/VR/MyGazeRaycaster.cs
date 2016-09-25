@@ -2,7 +2,7 @@
 using UnityEngine.EventSystems;
 using System.Collections;
 
-public class GazeRaycaster : BaseRaycaster
+public class MyGazeRaycaster : BaseRaycaster
 {
 	const float MAX_DISTANCE = 1000f;
 
@@ -11,10 +11,18 @@ public class GazeRaycaster : BaseRaycaster
 
 	private Vector2 centerOfViewPort = new Vector2 (.5f, .5f);
 
+	bool shouldRaycast ()
+	{
+		return VRMaster.instance.GAZE_ENABLED;
+	}
+
 	#region implemented abstract members of BaseRaycaster
 
 	public override void Raycast (PointerEventData eventData, System.Collections.Generic.List<RaycastResult> resultAppendList)
 	{
+		if (!shouldRaycast ()) {
+			return;
+		}
 		Ray ray = Camera.main.ViewportPointToRay (centerOfViewPort);
 		RaycastHit hitInfo;
 		Physics.Raycast (ray, out hitInfo, MAX_DISTANCE, layerMask);
