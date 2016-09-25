@@ -11,4 +11,15 @@ do
 echo "- Device            : $device"
 done
 
-ANDROID_SERIAL=$( echo $devices | cut -d' ' -f1 ) adb logcat -s Unity
+ANDROID_SERIAL=$( echo $devices | cut -d' ' -f1 )
+
+while [ $# -gt 0 ]
+do
+  if [ "$1" == "-c" ]
+  then
+    adb logcat -c
+  fi
+  shift
+done
+
+adb logcat -s Unity
