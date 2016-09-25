@@ -43,7 +43,7 @@ then
   do
     dname=$(dirname $file)
     [ ! -d $dname ] && echo "  mkdir -p $dname"
-    echo "  cp $REFDIR/$file $dname/"
+    echo " # cp $REFDIR/$file $dname/"
   done
 
   exit 1
