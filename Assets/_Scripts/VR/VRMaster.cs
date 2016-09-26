@@ -107,7 +107,7 @@ public class VRMaster : MonoBehaviour
 			ToggleVR ();
 		}
 		#if UNITY_ANDROID
-		if (GVR_STEREO && Input.GetKeyDown (GameKey.Escape.keyCode)) {
+		if (GVR_STEREO && Input.GetKeyDown (GameKey._Escape.keyCode)) {
 			ToggleVR ();
 		}
 		#endif
