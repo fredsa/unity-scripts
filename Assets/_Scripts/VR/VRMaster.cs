@@ -4,6 +4,8 @@ using UnityEngine.VR;
 using System;
 using Valve.VR;
 using UnityEngine.Assertions;
+using UnityEngine.Analytics;
+using System.Collections.Generic;
 
 public class VRMaster : MonoBehaviour
 {
@@ -284,6 +286,10 @@ public class VRMaster : MonoBehaviour
 	void AnnounceVRStateChange ()
 	{
 		Debug.Log ("_vrState -> " + _vrState);
+		Analytics.CustomEvent ("VRStateChange", new Dictionary<string, object> {
+			{ "unscaledTime", Time.unscaledTime.ToString () },
+			{ "_vrState", _vrState.ToString () },
+		});
 		if (_VRStateChange != null) {
 			_VRStateChange (_vrState);
 		}
