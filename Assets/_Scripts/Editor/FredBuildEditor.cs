@@ -226,7 +226,7 @@ public class FredBuildEditor : EditorWindow
 				UnityEngine.Debug.LogWarning (PlayerSettings.Android.keystoreName + " does not exist");
 			}
 		}
-		if (PlayerSettings.Android.keyaliasName != " androidkey") {
+		if (PlayerSettings.Android.keyaliasName != "androidkey") {
 			PlayerSettings.Android.keyaliasName = "androidkey";
 			UnityEngine.Debug.Log ("PlayerSettings.Android.keyaliasName -> " + PlayerSettings.Android.keyaliasName);
 		}
