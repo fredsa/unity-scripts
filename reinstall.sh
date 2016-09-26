@@ -34,18 +34,21 @@ then
   exit 1
 fi
 
+# Check API count
+apk=$( ls -1 "$root"/*.apk )
+apk_count=$(( $( echo "$apk" | wc -l ) ))
+if [ $apk_count -ne 1 ]
+then
+  echo "ERROR: Found $apk_count APKs but expecting exactly 1" 1>&2
+  ls -l $apk 1>&2
+  exit 1
+fi
+
 # Determine APK filename
-apk="$pkg.apk"
 if [ ! -r "$pkg.apk" ]
 then
-  apk=$( ls -1 "$root"/*.apk )
-  apk_count=$(( $( echo "$apk" | wc -l ) ))
-  if [ $apk_count -ne 1 ]
-  then
-    echo "ERROR: Found $apk_count APKs but expecting exactly 1" 1>&2
-    ls -l $apk 1>&2
-    exit 1
-  fi
+  echo "ERROR: Found $apk, but expected $pkg.apk" 1>&2
+  exit 1
 fi
 
 # Determine overriding Android activity name from AndroidManifest.xml
