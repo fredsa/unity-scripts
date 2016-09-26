@@ -22,7 +22,7 @@ public class FredBuildEditor : EditorWindow
 	static FredBuildEditor ()
 	{
 #if UNITY_ANDROID
-		CheckPasswords ();
+		CheckAndroidKeystore ();
 #endif
 	}
 
@@ -32,7 +32,7 @@ public class FredBuildEditor : EditorWindow
 		ClearLog ();
 		UnityEngine.Debug.Log ("FRED/Build " + EditorUserBuildSettings.activeBuildTarget + "\n");
 
-		CheckPasswords ();
+		CheckAndroidKeystore ();
 
 		string binary;
 		switch (EditorUserBuildSettings.activeBuildTarget) {
@@ -216,13 +216,27 @@ public class FredBuildEditor : EditorWindow
 		method.Invoke (new UnityEngine.Object (), null);
 	}
 
-	static void CheckPasswords ()
+	[MenuItem ("FRED/Check Android Keystore")]
+	static void CheckAndroidKeystore ()
 	{
+		if (PlayerSettings.Android.keystoreName.Length == 0 || !File.Exists (PlayerSettings.Android.keystoreName)) {
+			PlayerSettings.Android.keystoreName = System.Environment.GetFolderPath (Environment.SpecialFolder.MyDocuments) + "/Documents/android-keystore.keystore";
+			UnityEngine.Debug.Log ("PlayerSettings.Android.keystoreName -> " + PlayerSettings.Android.keystoreName);
+			if (!File.Exists (PlayerSettings.Android.keystoreName)) {
+				UnityEngine.Debug.LogWarning (PlayerSettings.Android.keystoreName + " does not exist");
+			}
+		}
+		if (PlayerSettings.Android.keyaliasName != " androidkey") {
+			PlayerSettings.Android.keyaliasName = "androidkey";
+			UnityEngine.Debug.Log ("PlayerSettings.Android.keyaliasName -> " + PlayerSettings.Android.keyaliasName);
+		}
 		if (PlayerSettings.keystorePass.Length == 0 || PlayerSettings.keyaliasPass.Length == 0) {
 			string path = System.Environment.GetFolderPath (Environment.SpecialFolder.MyDocuments) + "/.fred-build-info";
 			string password = File.ReadAllText (path);
 			PlayerSettings.keystorePass = password;
 			PlayerSettings.keyaliasPass = password;
+			UnityEngine.Debug.Log ("PlayerSettings.keystorePass <-- " + path);
+			UnityEngine.Debug.Log ("PlayerSettings.keyaliasPass <-- " + path);
 		}
 	}
 
