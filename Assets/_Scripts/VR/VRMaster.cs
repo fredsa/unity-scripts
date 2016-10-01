@@ -7,7 +7,7 @@ using UnityEngine.Assertions;
 using UnityEngine.Analytics;
 using System.Collections.Generic;
 
-#if UNITY_EDITOR
+#if UNITY_EDITOR && UNITY_ANDROID
 using Gvr.Internal;
 #endif
 
@@ -266,40 +266,7 @@ public class VRMaster : MonoBehaviour
 
 	void TeardownGVR ()
 	{
-		foreach (GvrController gvrController in GameObject.FindObjectsOfType<GvrController>()) {
-			Debug.LogWarning ("TeardownGVR(): - gvrController=" + gvrController);
-			Destroy (gvrController.gameObject);
-		}
-		#if UNITY_EDITOR
-		foreach (EmulatorConfig emulatorconfig in GameObject.FindObjectsOfType<EmulatorConfig>()) {
-			Debug.LogWarning ("TeardownGVR(): - emulatorconfig=" + emulatorconfig);
-			Destroy (emulatorconfig.gameObject);
-		}
-		#endif
-		#if !UNITY_HAS_GOOGLEVR || UNITY_EDITOR
-		foreach (GvrPreRender gvrPreRender in GameObject.FindObjectsOfType<GvrPreRender>()) {
-			Debug.LogWarning ("TeardownGVR(): - gvrPreRender=" + gvrPreRender);
-			Destroy (gvrPreRender.gameObject);
-		}
-		foreach (GvrPostRender gvrPostRender in GameObject.FindObjectsOfType<GvrPostRender>()) {
-			Debug.LogWarning ("TeardownGVR(): - gvrPostRender=" + gvrPostRender);
-			Destroy (gvrPostRender.gameObject);
-		}
-		#endif
-		foreach (GvrHead gvrHead in GameObject.FindObjectsOfType<GvrHead>()) {
-			Debug.LogWarning ("TeardownGVR(): - gvrHead=" + gvrHead);
-			Destroy (gvrHead.gameObject);
-		}
-		foreach (GvrEye gvrEye in GameObject.FindObjectsOfType<GvrEye>()) {
-			Debug.LogWarning ("TeardownGVR(): - gvrEye=" + gvrEye);
-			Destroy (gvrEye.gameObject);
-		}
-		foreach (StereoController stereoController in GameObject.FindObjectsOfType<StereoController>()) {
-			Debug.LogWarning ("TeardownGVR(): - stereoController=" + stereoController);
-			Destroy (stereoController.gameObject);
-		}
 		foreach (GvrViewer gvrViewer in GameObject.FindObjectsOfType<GvrViewer>()) {
-			Debug.LogWarning ("TeardownGVR(): gvrViewer=" + gvrViewer);
 			Destroy (gvrViewer.gameObject);
 		}
 	}
@@ -310,11 +277,9 @@ public class VRMaster : MonoBehaviour
 		GvrViewer.Create ();
 		#if UNITY_EDITOR
 		GvrViewer.Instance.VRModeEnabled = false;
-		#endif
-		GvrViewer.Instance.gameObject.AddComponent<GvrController> ();
-		#if UNITY_EDITOR
 		GvrViewer.Instance.gameObject.AddComponent<EmulatorConfig> ();
 		#endif
+		GvrViewer.Instance.gameObject.AddComponent<GvrController> ();
 	}
 
 	void TeardownOpenVR ()
