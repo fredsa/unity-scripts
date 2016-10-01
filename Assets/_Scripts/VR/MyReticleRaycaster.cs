@@ -2,7 +2,7 @@
 using UnityEngine.EventSystems;
 using System.Collections;
 
-public class MyGazeRaycaster : BaseRaycaster
+public class MyReticleRaycaster : BaseRaycaster
 {
 	const float MAX_DISTANCE = 1000f;
 
@@ -13,7 +13,7 @@ public class MyGazeRaycaster : BaseRaycaster
 
 	bool shouldRaycast ()
 	{
-		return VRMaster.instance.GAZE_ENABLED;
+		return VRMaster.instance.RETICLE_ENABLED;
 	}
 
 	#region implemented abstract members of BaseRaycaster
@@ -23,7 +23,7 @@ public class MyGazeRaycaster : BaseRaycaster
 		if (!shouldRaycast ()) {
 			return;
 		}
-		Ray ray = Camera.main.ViewportPointToRay (centerOfViewPort);
+		Ray ray = MakeRay ();
 		RaycastHit hitInfo;
 		Physics.Raycast (ray, out hitInfo, MAX_DISTANCE, layerMask);
 
@@ -50,6 +50,15 @@ public class MyGazeRaycaster : BaseRaycaster
 			result.worldPosition = hitInfo.point;
 
 			resultAppendList.Add (result);
+		}
+	}
+
+	Ray MakeRay ()
+	{
+		if (GvrController.State == GvrConnectionState.Connected) {
+			return new Ray (eventCamera.transform.position, GvrController.Orientation * Vector3.forward);
+		} else {
+			return eventCamera.ViewportPointToRay (centerOfViewPort);
 		}
 	}
 

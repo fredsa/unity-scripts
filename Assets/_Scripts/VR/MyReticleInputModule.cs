@@ -5,16 +5,14 @@ using UnityEngine.EventSystems;
 using UnityEngine.VR;
 #endif  // UNITY_HAS_GOOGLEVR && (UNITY_ANDROID || UNITY_EDITOR)
 
-public class MyGazeInputModule : BaseInputModule
+public class MyReticleInputModule : BaseInputModule
 {
 
-	/// The IGvrGazePointer which will be responding to gaze events.
-	public static IGvrGazePointer gazePointer;
+	public static IReticlePointer reticlePointer;
 
 	private PointerEventData pointerData;
 	private Vector2 lastHeadPose;
 
-	// Active state
 	private bool isActive = false;
 
 	/// Time in seconds between the pointer down and up events sent by a trigger.
@@ -27,15 +25,15 @@ public class MyGazeInputModule : BaseInputModule
 	{
 		bool activeState = base.ShouldActivateModule ();
 
-		activeState = activeState && VRMaster.instance.GAZE_ENABLED;
+		activeState = activeState && VRMaster.instance.RETICLE_ENABLED;
 
 		if (activeState != isActive) {
 			isActive = activeState;
 
-			// Activate gaze pointer
-			if (gazePointer != null) {
+			// Activate reticle pointer
+			if (reticlePointer != null) {
 				if (isActive) {
-					gazePointer.OnGazeEnabled ();
+					reticlePointer.OnReticlePointerEnabled ();
 				}
 			}
 		}
@@ -67,7 +65,7 @@ public class MyGazeInputModule : BaseInputModule
 		// Save the previous Game Object
 		GameObject gazeObjectPrevious = GetCurrentGameObject ();
 
-		CastRayFromGaze ();
+		CastRayForReticle ();
 		UpdateCurrentObject ();
 		UpdateReticle (gazeObjectPrevious);
 
@@ -81,7 +79,7 @@ public class MyGazeInputModule : BaseInputModule
 			HandleDrag ();
 		} else if (Time.unscaledTime - pointerData.clickTime < clickTime) {
 			// Delay new events until clickTime has passed.
-		} else if (!pointerData.eligibleForClick && Input.GetMouseButtonDown (0)) {
+		} else if (!pointerData.eligibleForClick && (Input.GetMouseButtonDown (0) || GvrController.ClickButtonDown)) {
 			// New trigger action.
 			HandleTrigger ();
 		} else if (handlePendingClickRequired) {
@@ -92,7 +90,7 @@ public class MyGazeInputModule : BaseInputModule
 
 	/// @endcond
 
-	private void CastRayFromGaze ()
+	private void CastRayForReticle ()
 	{
 		Vector2 headPose = NormalizedCartesianToSpherical (Camera.main.transform.rotation * Vector3.forward);
 
@@ -103,7 +101,7 @@ public class MyGazeInputModule : BaseInputModule
 
 		// Cast a ray into the scene
 		pointerData.Reset ();
-		pointerData.position = GetGazePointerPosition ();
+		pointerData.position = GetReticlePointerPosition ();
 		eventSystem.RaycastAll (pointerData, m_RaycastResultCache);
 		pointerData.pointerCurrentRaycast = FindFirstRaycast (m_RaycastResultCache);
 		m_RaycastResultCache.Clear ();
@@ -128,7 +126,7 @@ public class MyGazeInputModule : BaseInputModule
 
 	void UpdateReticle (GameObject previousGazedObject)
 	{
-		if (gazePointer == null) {
+		if (reticlePointer == null) {
 			return;
 		}
 
@@ -140,15 +138,15 @@ public class MyGazeInputModule : BaseInputModule
 
 		if (gazeObject == previousGazedObject) {
 			if (gazeObject != null) {
-				gazePointer.OnGazeStay (camera, gazeObject, intersectionPosition, isInteractive);
+				reticlePointer.OnReticlePointerStay (camera, gazeObject, intersectionPosition, isInteractive);
 			}
 		} else {
 			if (previousGazedObject != null) {
-				gazePointer.OnGazeExit (camera, previousGazedObject);
+				reticlePointer.OnReticlePointerExit (camera, previousGazedObject);
 			}
 
 			if (gazeObject != null) {
-				gazePointer.OnGazeStart (camera, gazeObject, intersectionPosition, isInteractive);
+				reticlePointer.OnReticlePointerStart (camera, gazeObject, intersectionPosition, isInteractive);
 			}
 		}
 	}
@@ -184,9 +182,9 @@ public class MyGazeInputModule : BaseInputModule
 			return;
 		}
 
-		if (gazePointer != null) {
+		if (reticlePointer != null) {
 			Camera camera = pointerData.enterEventCamera;
-			gazePointer.OnGazeTriggerEnd (camera);
+			reticlePointer.OnReticlePointerTriggerEnd (camera);
 		}
 
 		var go = pointerData.pointerCurrentRaycast.gameObject;
@@ -236,8 +234,8 @@ public class MyGazeInputModule : BaseInputModule
 		pointerData.clickCount = 1;
 		pointerData.clickTime = Time.unscaledTime;
 
-		if (gazePointer != null) {
-			gazePointer.OnGazeTriggerStart (pointerData.enterEventCamera);
+		if (reticlePointer != null) {
+			reticlePointer.OnReticlePointerTriggerStart (pointerData.enterEventCamera);
 		}
 	}
 
@@ -278,20 +276,20 @@ public class MyGazeInputModule : BaseInputModule
 
 	void DisableGazePointer ()
 	{
-		if (gazePointer == null) {
+		if (reticlePointer == null) {
 			return;
 		}
 
 		GameObject currentGameObject = GetCurrentGameObject ();
 		if (currentGameObject) {
 			Camera camera = pointerData.enterEventCamera;
-			gazePointer.OnGazeExit (camera, currentGameObject);
+			reticlePointer.OnReticlePointerExit (camera, currentGameObject);
 		}
 
-		gazePointer.OnGazeDisabled ();
+		reticlePointer.OnReticlePointerDisabled ();
 	}
 
-	private Vector2 GetGazePointerPosition ()
+	private Vector2 GetReticlePointerPosition ()
 	{
 		int viewportWidth = Screen.width;
 		int viewportHeight = Screen.height;

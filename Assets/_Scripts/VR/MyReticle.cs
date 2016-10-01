@@ -4,7 +4,7 @@ using System;
 /// Draws a circular reticle in front of any object that the user gazes at.
 /// The circle dilates if the object is clickable.
 [RequireComponent (typeof(Renderer))]
-public class MyGazeReticle : MonoBehaviour, IGvrGazePointer
+public class MyReticle : MonoBehaviour, IReticlePointer
 {
 
 	// Minimum distance of the reticle (in meters).
@@ -45,7 +45,7 @@ public class MyGazeReticle : MonoBehaviour, IGvrGazePointer
 			case ReticleType.UNKNOWN:
 				reticleMinInnerAngle = .5f;
 				reticleMinOuterAngle = .8f;
-				_reticleGrowthAngle = .8f;
+				_reticleGrowthAngle = .7f;
 				break;
 			case ReticleType.TINY_CIRCLE:
 				reticleMinInnerAngle = 0f;
@@ -74,7 +74,7 @@ public class MyGazeReticle : MonoBehaviour, IGvrGazePointer
 	private GameObject targetObj;
 
 	// Current distance of the reticle (in meters).
-	private float reticleDistanceInMeters = reticleMinDistance;
+	private float reticleDistanceInMeters;
 
 	// Current inner and outer diameters of the reticle,
 	// before distance multiplication.
@@ -86,6 +86,7 @@ public class MyGazeReticle : MonoBehaviour, IGvrGazePointer
 	void Awake ()
 	{
 		meshRenderer = GetComponent<MeshRenderer> ();
+		reticleDistanceInMeters = reticleMaxDistance;
 	}
 
 	void Start ()
@@ -101,15 +102,15 @@ public class MyGazeReticle : MonoBehaviour, IGvrGazePointer
 	{
 		VRMaster.instance.VRStateChange += OnVRStateChange;
 		GameMaster.instance.GameStateChange += OnGameStateChange;
-		MyGazeInputModule.gazePointer = this;
+		MyReticleInputModule.reticlePointer = this;
 	}
 
 	void OnDisable ()
 	{
 		VRMaster.instance.VRStateChange -= OnVRStateChange;
 		GameMaster.instance.GameStateChange -= OnGameStateChange;
-		if (MyGazeInputModule.gazePointer == (IGvrGazePointer)this) {
-			MyGazeInputModule.gazePointer = null;
+		if (MyReticleInputModule.reticlePointer == (IReticlePointer)this) {
+			MyReticleInputModule.reticlePointer = null;
 		}
 	}
 
@@ -120,24 +121,25 @@ public class MyGazeReticle : MonoBehaviour, IGvrGazePointer
 
 	void OnVRStateChange (VRState vrState)
 	{
-		meshRenderer.enabled = VRMaster.instance.GAZE_ENABLED;
+		meshRenderer.enabled = VRMaster.instance.RETICLE_ENABLED;
 	}
 
 	void Update ()
 	{
 		if (meshRenderer.enabled) {
+			transform.localRotation = GvrController.State == GvrConnectionState.Connected ? GvrController.Orientation : Camera.main.transform.localRotation;
 			UpdateDiameters ();
 		}
 	}
 
 	/// This is called when the 'BaseInputModule' system should be enabled.
-	public void OnGazeEnabled ()
+	public void OnReticlePointerEnabled ()
 	{
 
 	}
 
 	/// This is called when the 'BaseInputModule' system should be disabled.
-	public void OnGazeDisabled ()
+	public void OnReticlePointerDisabled ()
 	{
 
 	}
@@ -148,11 +150,11 @@ public class MyGazeReticle : MonoBehaviour, IGvrGazePointer
 	/// The camera is the event camera, the target is the object
 	/// the user is looking at, and the intersectionPosition is the intersection
 	/// point of the ray sent from the camera on the object.
-	public void OnGazeStart (Camera camera, GameObject targetObject, Vector3 intersectionPosition,
-	                         bool isInteractive)
+	public void OnReticlePointerStart (Camera camera, GameObject targetObject, Vector3 intersectionPosition,
+	                                   bool isInteractive)
 	{
 		LaserInteractable li = targetObject.GetComponent<LaserInteractable> ();
-		reticleType = li != null ? li.GetReticleGrowthAngle () : MyGazeReticle.ReticleType.UNKNOWN;
+		reticleType = li != null ? li.GetReticleGrowthAngle () : MyReticle.ReticleType.UNKNOWN;
 		SetGazeTarget (intersectionPosition, isInteractive);
 	}
 
@@ -162,20 +164,20 @@ public class MyGazeReticle : MonoBehaviour, IGvrGazePointer
 	/// The camera is the event camera, the target is the object the user is
 	/// looking at, and the intersectionPosition is the intersection point of the
 	/// ray sent from the camera on the object.
-	public void OnGazeStay (Camera camera, GameObject targetObject, Vector3 intersectionPosition,
-	                        bool isInteractive)
+	public void OnReticlePointerStay (Camera camera, GameObject targetObject, Vector3 intersectionPosition,
+	                                  bool isInteractive)
 	{
 		SetGazeTarget (intersectionPosition, isInteractive);
 	}
 
 	/// Called when the user's look no longer intersects an object previously
 	/// intersected with a ray projected from the camera.
-	/// This is also called just before **OnGazeDisabled** and may have have any of
+	/// This is also called just before **OnReticlePointerDisabled** and may have have any of
 	/// the values set as **null**.
 	///
 	/// The camera is the event camera and the target is the object the user
 	/// previously looked at.
-	public void OnGazeExit (Camera camera, GameObject targetObject)
+	public void OnReticlePointerExit (Camera camera, GameObject targetObject)
 	{
 		reticleDistanceInMeters = reticleMaxDistance;
 		_reticleInnerAngle = reticleMinInnerAngle;
@@ -184,14 +186,14 @@ public class MyGazeReticle : MonoBehaviour, IGvrGazePointer
 
 	/// Called when a trigger event is initiated. This is practically when
 	/// the user begins pressing the trigger.
-	public void OnGazeTriggerStart (Camera camera)
+	public void OnReticlePointerTriggerStart (Camera camera)
 	{
 		// Put your reticle trigger start logic here :)
 	}
 
 	/// Called when a trigger event is finished. This is practically when
 	/// the user releases the trigger.
-	public void OnGazeTriggerEnd (Camera camera)
+	public void OnReticlePointerTriggerEnd (Camera camera)
 	{
 		// Put your reticle trigger end logic here :)
 	}

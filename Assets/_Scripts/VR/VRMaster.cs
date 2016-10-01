@@ -7,10 +7,16 @@ using UnityEngine.Assertions;
 using UnityEngine.Analytics;
 using System.Collections.Generic;
 
+#if UNITY_EDITOR
+using Gvr.Internal;
+#endif
+
 public class VRMaster : MonoBehaviour
 {
 
 	protected bool DEBUG = false;
+
+	const float PINCH_TO_ZOOM_RATE = 0.5f;
 
 	const string DEVICE_OPENVR = "OpenVR";
 	const string DEVICE_DAYDREAM = "daydream";
@@ -47,10 +53,11 @@ public class VRMaster : MonoBehaviour
 		private set { }
 	}
 
-	public bool GAZE_ENABLED {
-		get { return  _vrState == VRState.GVR_STEREO || _vrState == VRState.MAGIC_WINDOW; }
+	public bool RETICLE_ENABLED {
+		get { return _vrState == VRState.GVR_STEREO || _vrState == VRState.MAGIC_WINDOW; }
 		private set { }
 	}
+
 
 
 	// vr state change events
@@ -88,6 +95,11 @@ public class VRMaster : MonoBehaviour
 		if (DEBUG) {
 			Debug.Log ("Awake(): " + state);
 		}
+
+		#if UNITY_ANDROID && UNITY_EDITOR
+		TeardownGVR ();
+		SetupGVRController ();
+		#endif
 		_vrState = GetVrState ();
 		if (DEBUG) {
 			Debug.Log ("Awake(): _vrState -> " + _vrState);
@@ -112,7 +124,38 @@ public class VRMaster : MonoBehaviour
 		if (GVR_STEREO && Input.GetKeyDown (GameKey._Escape.keyCode)) {
 			ToggleVR ();
 		}
+		PinchToZoom ();
 		#endif
+	}
+
+
+	// https://unity3d.com/learn/tutorials/topics/mobile-touch/pinch-zoom
+	void PinchToZoom ()
+	{
+		if (Input.touchCount != 2) {
+			return;
+		}
+
+		// Store both touches.
+		Touch touch0 = Input.GetTouch (0);
+		Touch touch1 = Input.GetTouch (1);
+
+		// Find the position in the previous frame of each touch.
+		Vector2 touch0PrevPos = touch0.position - touch0.deltaPosition;
+		Vector2 touch1PrevPos = touch1.position - touch1.deltaPosition;
+
+		// Find the magnitude of the vector (the distance) between the touches in each frame.
+		float deltaPrevTouch = (touch0PrevPos - touch1PrevPos).magnitude;
+		float deltaTouch = (touch0.position - touch1.position).magnitude;
+
+		// Find the difference in the distances between each frame.
+		float deltaDIff = deltaPrevTouch - deltaTouch;
+
+		// Otherwise change the field of view based on the change in distance between the touches.
+		Camera.main.fieldOfView += deltaDIff * PINCH_TO_ZOOM_RATE;
+
+		// Clamp field of view to resonable range
+		Camera.main.fieldOfView = Mathf.Clamp (Camera.main.fieldOfView, 20f, 90f);
 	}
 
 	bool SafeIsHmdPresent ()
@@ -204,6 +247,14 @@ public class VRMaster : MonoBehaviour
 		}
 		#endif
 
+		if (desiredDeviceName != DEVICE_DAYDREAM && desiredDeviceName != DEVICE_CARDBOARD) {
+			TeardownGVR ();
+		}
+
+		if (desiredDeviceName == DEVICE_DAYDREAM) {
+			SetupGVRController ();
+		}
+
 		if (DEBUG) {
 			Debug.Log ("******* Camera.main.ResetFieldOfView() / Camera.main.ResetAspect ()");
 		}
@@ -213,7 +264,60 @@ public class VRMaster : MonoBehaviour
 		SetAndAnnounceVrState ();
 	}
 
-	void ShutdownOpenVR ()
+	void TeardownGVR ()
+	{
+		foreach (GvrController gvrController in GameObject.FindObjectsOfType<GvrController>()) {
+			Debug.LogWarning ("TeardownGVR(): - gvrController=" + gvrController);
+			Destroy (gvrController.gameObject);
+		}
+		#if UNITY_EDITOR
+		foreach (EmulatorConfig emulatorconfig in GameObject.FindObjectsOfType<EmulatorConfig>()) {
+			Debug.LogWarning ("TeardownGVR(): - emulatorconfig=" + emulatorconfig);
+			Destroy (emulatorconfig.gameObject);
+		}
+		#endif
+		#if !UNITY_HAS_GOOGLEVR || UNITY_EDITOR
+		foreach (GvrPreRender gvrPreRender in GameObject.FindObjectsOfType<GvrPreRender>()) {
+			Debug.LogWarning ("TeardownGVR(): - gvrPreRender=" + gvrPreRender);
+			Destroy (gvrPreRender.gameObject);
+		}
+		foreach (GvrPostRender gvrPostRender in GameObject.FindObjectsOfType<GvrPostRender>()) {
+			Debug.LogWarning ("TeardownGVR(): - gvrPostRender=" + gvrPostRender);
+			Destroy (gvrPostRender.gameObject);
+		}
+		#endif
+		foreach (GvrHead gvrHead in GameObject.FindObjectsOfType<GvrHead>()) {
+			Debug.LogWarning ("TeardownGVR(): - gvrHead=" + gvrHead);
+			Destroy (gvrHead.gameObject);
+		}
+		foreach (GvrEye gvrEye in GameObject.FindObjectsOfType<GvrEye>()) {
+			Debug.LogWarning ("TeardownGVR(): - gvrEye=" + gvrEye);
+			Destroy (gvrEye.gameObject);
+		}
+		foreach (StereoController stereoController in GameObject.FindObjectsOfType<StereoController>()) {
+			Debug.LogWarning ("TeardownGVR(): - stereoController=" + stereoController);
+			Destroy (stereoController.gameObject);
+		}
+		foreach (GvrViewer gvrViewer in GameObject.FindObjectsOfType<GvrViewer>()) {
+			Debug.LogWarning ("TeardownGVR(): gvrViewer=" + gvrViewer);
+			Destroy (gvrViewer.gameObject);
+		}
+	}
+
+	void SetupGVRController ()
+	{
+		Debug.Log ("SetupGVRController()");
+		GvrViewer.Create ();
+		#if UNITY_EDITOR
+		GvrViewer.Instance.VRModeEnabled = false;
+		#endif
+		GvrViewer.Instance.gameObject.AddComponent<GvrController> ();
+		#if UNITY_EDITOR
+		GvrViewer.Instance.gameObject.AddComponent<EmulatorConfig> ();
+		#endif
+	}
+
+	void TeardownOpenVR ()
 	{
 		SteamVR_Render steamVR_RenderInstance = SteamVR_Render.instance;
 
