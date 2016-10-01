@@ -45,7 +45,7 @@ public class MyReticle : MonoBehaviour, IReticlePointer
 			case ReticleType.UNKNOWN:
 				reticleMinInnerAngle = .5f;
 				reticleMinOuterAngle = .8f;
-				_reticleGrowthAngle = .7f;
+				_reticleGrowthAngle = .5f;
 				break;
 			case ReticleType.TINY_CIRCLE:
 				reticleMinInnerAngle = 0f;
