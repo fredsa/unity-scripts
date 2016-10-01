@@ -220,7 +220,9 @@ public class FredBuildEditor : EditorWindow
 	static void CheckAndroidKeystore ()
 	{
 		if (PlayerSettings.Android.keystoreName.Length == 0 || !File.Exists (PlayerSettings.Android.keystoreName)) {
-			PlayerSettings.Android.keystoreName = System.Environment.GetFolderPath (Environment.SpecialFolder.MyDocuments) + "/Documents/android-keystore.keystore";
+			PlayerSettings.Android.keystoreName = System.Environment.GetFolderPath (Environment.SpecialFolder.MyDocuments)
+			+ (Application.platform == RuntimePlatform.WindowsEditor ? "" : "/Documents")
+			+ "/android-keystore.keystore";
 			UnityEngine.Debug.Log ("PlayerSettings.Android.keystoreName -> " + PlayerSettings.Android.keystoreName);
 			if (!File.Exists (PlayerSettings.Android.keystoreName)) {
 				UnityEngine.Debug.LogWarning (PlayerSettings.Android.keystoreName + " does not exist");
