@@ -116,7 +116,7 @@ public class MyReticle : MonoBehaviour, IReticlePointer
 
 	void OnGameStateChange (GameState gameState)
 	{
-		reticleMaxDistance = (gameState == GameState.SELECTING_GAME_STYLE || gameState == GameState.PLACING_SHIPS) ? .7f : 12f;
+		reticleMaxDistance = (gameState == GameState.SELECTING_GAME_STYLE || gameState == GameState.PLACING_SHIPS) ? 2f : 12f;
 	}
 
 	void OnVRStateChange (VRState vrState)
