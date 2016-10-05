@@ -69,17 +69,18 @@ public class MyReticleInputModule : BaseInputModule
 		UpdateCurrentObject ();
 		UpdateReticle (gazeObjectPrevious);
 
-		bool handlePendingClickRequired = !Input.GetMouseButton (0);
+		bool handlePendingClickRequired = !Input.GetButton ("Fire1");
+		;
 		#if UNITY_HAS_GOOGLEVR && (UNITY_ANDROID || UNITY_EDITOR)
 		handlePendingClickRequired &= !GvrController.ClickButton;
 		#endif  // UNITY_HAS_GOOGLEVR && (UNITY_ANDROID || UNITY_EDITOR)
 
 		// Handle input
-		if (!Input.GetMouseButtonDown (0) && Input.GetMouseButton (0)) {
+		if (!Input.GetButtonDown ("Fire1") && Input.GetButton ("Fire1")) {
 			HandleDrag ();
 		} else if (Time.unscaledTime - pointerData.clickTime < clickTime) {
 			// Delay new events until clickTime has passed.
-		} else if (!pointerData.eligibleForClick && (Input.GetMouseButtonDown (0) || GvrController.ClickButtonDown)) {
+		} else if (!pointerData.eligibleForClick && (Input.GetButtonDown ("Fire1") || GvrController.ClickButtonDown)) {
 			// New trigger action.
 			HandleTrigger ();
 		} else if (handlePendingClickRequired) {
