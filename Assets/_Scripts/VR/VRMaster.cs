@@ -243,7 +243,7 @@ public class VRMaster : MonoBehaviour
 
 		#if UNITY_STANDALONE
 		if (desiredDeviceName != DEVICE_OPENVR) {
-			ShutdownOpenVR ();
+			TeardownOpenVR ();
 		}
 		#endif
 
@@ -275,7 +275,7 @@ public class VRMaster : MonoBehaviour
 	{
 		Debug.Log ("SetupGVRController()");
 		GvrViewer.Create ();
-		#if UNITY_EDITOR
+		#if UNITY_EDITOR && UNITY_ANDROID
 		GvrViewer.Instance.VRModeEnabled = false;
 		GvrViewer.Instance.gameObject.AddComponent<EmulatorConfig> ();
 		#endif
