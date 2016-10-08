@@ -3,8 +3,6 @@
 
 set -ue
 
-$( dirname $0 )/version-check.sh
-
 devices=$(adb devices | sort | grep device\$ | cut -f1 | tr '\n' ' ')
 for device in $devices
 do
