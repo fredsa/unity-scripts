@@ -25,7 +25,7 @@ public class MyReticleInputModule : BaseInputModule
 	{
 		bool activeState = base.ShouldActivateModule ();
 
-		activeState = activeState && VRMaster.instance.RETICLE_ENABLED;
+		activeState = activeState && VRMaster.instance.RETICLE_ENABLED && !Application.isEditor;
 
 		if (activeState != isActive) {
 			isActive = activeState;
@@ -80,13 +80,26 @@ public class MyReticleInputModule : BaseInputModule
 			HandleDrag ();
 		} else if (Time.unscaledTime - pointerData.clickTime < clickTime) {
 			// Delay new events until clickTime has passed.
-		} else if (!pointerData.eligibleForClick && (Input.GetButtonDown ("Fire1") || GvrController.ClickButtonDown)) {
+		} else if (!pointerData.eligibleForClick && DidClick ()) {
 			// New trigger action.
 			HandleTrigger ();
 		} else if (handlePendingClickRequired) {
 			// Check if there is a pending click to handle.
 			HandlePendingClick ();
 		}
+	}
+
+	bool DidClick ()
+	{
+		if (Input.GetButtonDown ("Fire1")) {
+			return true;
+		}
+		#if UNITY_ANDROID
+		if (GvrController.ClickButtonDown) {
+			return true;
+		}
+		#endif
+		return false;
 	}
 
 	/// @endcond

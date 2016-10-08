@@ -13,7 +13,7 @@ public class MyReticleRaycaster : BaseRaycaster
 
 	bool shouldRaycast ()
 	{
-		return VRMaster.instance.RETICLE_ENABLED;
+		return VRMaster.instance.RETICLE_ENABLED && !Application.isEditor;
 	}
 
 	#region implemented abstract members of BaseRaycaster
@@ -55,11 +55,12 @@ public class MyReticleRaycaster : BaseRaycaster
 
 	Ray MakeRay ()
 	{
+		#if UNITY_ANDROID
 		if (GvrController.State == GvrConnectionState.Connected) {
 			return new Ray (eventCamera.transform.position, GvrController.Orientation * Vector3.forward);
-		} else {
-			return eventCamera.ViewportPointToRay (centerOfViewPort);
 		}
+		#endif
+		return eventCamera.ViewportPointToRay (centerOfViewPort);
 	}
 
 	public override Camera eventCamera {

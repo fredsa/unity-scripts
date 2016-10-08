@@ -17,6 +17,9 @@ public class VRMaster : MonoBehaviour
 	protected bool DEBUG = false;
 
 	const float PINCH_TO_ZOOM_RATE = 0.5f;
+	#if UNITY_ANDROID
+	const int TOGGLE_VR_MODE_TOUCH_COUNT = 4;
+	#endif
 
 	const string DEVICE_OPENVR = "OpenVR";
 	const string DEVICE_DAYDREAM = "daydream";
@@ -121,7 +124,7 @@ public class VRMaster : MonoBehaviour
 			ToggleVR ();
 		}
 		#if UNITY_ANDROID
-		if (GVR_STEREO && Input.GetKeyDown (GameKey._Escape.keyCode)) {
+		if (Input.touchCount == TOGGLE_VR_MODE_TOUCH_COUNT && Input.GetTouch (TOGGLE_VR_MODE_TOUCH_COUNT - 1).phase == TouchPhase.Began) {
 			ToggleVR ();
 		}
 		PinchToZoom ();
@@ -255,6 +258,14 @@ public class VRMaster : MonoBehaviour
 			SetupGVRController ();
 		}
 
+		#if UNITY_ANDROID
+		float oldRenderScale = VRSettings.renderScale;
+		VRSettings.renderScale = .6f; // GVR defaults to .7f
+		if (DEBUG) {
+			Debug.Log ("******* VRSettings.renderScale = " + oldRenderScale.ToString (".00000") + " -> " + VRSettings.renderScale.ToString (".00000"));
+		}
+		#endif
+
 		if (DEBUG) {
 			Debug.Log ("******* Camera.main.ResetFieldOfView() / Camera.main.ResetAspect ()");
 		}
@@ -279,7 +290,9 @@ public class VRMaster : MonoBehaviour
 		GvrViewer.Instance.VRModeEnabled = false;
 		GvrViewer.Instance.gameObject.AddComponent<EmulatorConfig> ();
 		#endif
+		#if UNITY_ANDROID
 		GvrViewer.Instance.gameObject.AddComponent<GvrController> ();
+		#endif
 	}
 
 	void TeardownOpenVR ()

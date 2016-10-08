@@ -29,7 +29,7 @@ public class MyPhysicsRaycaster : PhysicsRaycaster
 
 	bool shouldRaycast ()
 	{
-		return vrState == VRState.MONOSCOPIC || (vrState == VRState.MAGIC_WINDOW && !Application.isEditor);
+		return vrState == VRState.MONOSCOPIC || vrState == VRState.MAGIC_WINDOW;
 	}
 
 	public override void Raycast (PointerEventData eventData, System.Collections.Generic.List<RaycastResult> resultAppendList)

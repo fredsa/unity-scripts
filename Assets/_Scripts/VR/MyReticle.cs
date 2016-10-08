@@ -124,6 +124,7 @@ public class MyReticle : MonoBehaviour, IReticlePointer
 		meshRenderer.enabled = VRMaster.instance.RETICLE_ENABLED;
 	}
 
+	#if UNITY_ANDROID
 	void Update ()
 	{
 		if (meshRenderer.enabled) {
@@ -131,6 +132,7 @@ public class MyReticle : MonoBehaviour, IReticlePointer
 			UpdateDiameters ();
 		}
 	}
+	#endif
 
 	/// This is called when the 'BaseInputModule' system should be enabled.
 	public void OnReticlePointerEnabled ()
