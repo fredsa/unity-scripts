@@ -2,8 +2,6 @@
 
 set -ue
 
-$( dirname $0 )/version-check.sh
-
 ANDROID_SERIAL_FILE=android-serial.txt
 MANIFEST_PATH=Assets/Plugins/Android/AndroidManifest.xml
 PROJECT_SETTINGS=ProjectSettings/ProjectSettings.asset

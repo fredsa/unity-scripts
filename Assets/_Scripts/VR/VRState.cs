@@ -5,4 +5,5 @@
 	VIVE = 2,
 	GVR_STEREO = 3,
 	MAGIC_WINDOW = 4,
+	ERROR = 5,
 }

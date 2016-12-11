@@ -62,6 +62,19 @@ public class FredBuildEditor : EditorWindow
 		}
 	}
 
+	static void BuildSteamWin32Standalone ()
+	{
+		DirectoryInfo projectRoot = Directory.GetParent (Application.dataPath);
+		string binary = projectRoot + "/build/content/vr-battle-grid.exe";
+		DateTime lastWriteTime = File.GetLastWriteTime (binary);
+		UnityEngine.Debug.Log ("- Binary: " + binary + "\n");
+		BuildPipeline.BuildPlayer (GetSceneNames (), binary, EditorUserBuildSettings.activeBuildTarget, BuildOptions.AllowDebugging | BuildOptions.Development);
+		if (File.GetLastWriteTime (binary).Equals (lastWriteTime)) {
+			UnityEngine.Debug.LogError ("Failed to build " + binary);
+			EditorApplication.Exit (42);
+		}
+	}
+
 	static string[] GetSceneNames ()
 	{
 		string[] paths = new string[SceneManager.sceneCount];

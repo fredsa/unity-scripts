@@ -17,7 +17,7 @@ public class VRModeSelected : MonoBehaviour
 		VRMaster.instance.VRStateChange -= OnVRStateChange;
 	}
 
-	void OnVRStateChange (VRState state)
+	void OnVRStateChange (VRState state, float rotationAngle)
 	{
 		gameObject.SetActive (enabledWhen [(int)state]);
 	}

@@ -10,7 +10,11 @@ public class VRModeSelectedEditor : Editor
 
 	public override void OnInspectorGUI ()
 	{
-		//DrawDefaultInspector ();
+		// Add clickable script field, as would have been provided by DrawDefaultInspector()
+		MonoScript script = MonoScript.FromMonoBehaviour (target as MonoBehaviour);
+		EditorGUI.BeginDisabledGroup (true);
+		EditorGUILayout.ObjectField ("Script", script, typeof(MonoScript), false);
+		EditorGUI.EndDisabledGroup ();
 
 		VRModeSelected controller = (VRModeSelected)target;
 
